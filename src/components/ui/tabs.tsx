@@ -1,6 +1,6 @@
 import { Tab, Tabs } from "@nextui-org/react";
 import { type StickyScrollContent } from "./sticky-reveal";
-import { ElderScroll } from "@/components/app/scroll";
+import { Scrolly } from "@/components/app/scrolly";
 
 export interface TabItem {
   id: string | number;
@@ -9,17 +9,17 @@ export interface TabItem {
   content: StickyScrollContent[];
 }
 export interface TabCompProps {
-  items: TabItem[];
+  tabItems: TabItem[];
 }
 
-export function TabComp({ items }: TabCompProps) {
+export function TabComp({ tabItems }: TabCompProps) {
   return (
     <div className="flex w-full flex-col gap-4 tracking-tight md:items-center">
       <Tabs>
-        {items.map((item, i) => (
+        {tabItems.map((item, i) => (
           <Tab key={i} title={item.label} titleValue={item.value}>
             <div className="portrait:-ml-5 portrait:w-screen">
-              <ElderScroll content={item.content} />
+              <Scrolly content={item.content} />
             </div>
           </Tab>
         ))}

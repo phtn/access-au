@@ -29,6 +29,9 @@ export const env = createEnv({
     UPSTASH_EMAIL: z.string(),
     UPSTASH_API_K: z.string(),
     QSTASH_TOKEN: z.string(),
+
+    D_CONVEX_DEP_URL: z.string(),
+    D_CONVEX_DEP_KEY: z.string(),
   },
 
   /**
@@ -44,6 +47,8 @@ export const env = createEnv({
     NEXT_PUBLIC_F_APP_ID: z.string(),
     NEXT_PUBLIC_F_MEASUREMENT: z.string(),
     NEXT_PUBLIC_F_AUTH_DOMAIN: z.string(),
+
+    NEXT_PUBLIC_F_CONF_DOC_ID: z.string(),
   },
 
   /**
@@ -78,6 +83,11 @@ export const env = createEnv({
     NEXT_PUBLIC_F_APP_ID: process.env.NEXT_PUBLIC_F_APP_ID,
     NEXT_PUBLIC_F_MEASUREMENT: process.env.NEXT_PUBLIC_F_MEASUREMENT,
     F_ADMIN: process.env.F_ADMIN,
+
+    NEXT_PUBLIC_F_CONF_DOC_ID: process.env.NEXT_PUBLIC_F_CONF_DOC_ID,
+
+    D_CONVEX_DEP_URL: process.env.D_CONVEX_DEP_URL,
+    D_CONVEX_DEP_KEY: process.env.D_CONVEX_DEP_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

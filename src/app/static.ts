@@ -1,49 +1,27 @@
-import type { Action, HeroProps } from "@/components/app/hero";
 import { type StickyScrollContent } from "@/components/ui/sticky-reveal";
 import { type TabItem } from "@/components/ui/tabs";
 import type { Extras, TopbarLink, Brand } from "@/components/ui/topbar";
-import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 
 export const brand: Brand = {
-  // label: "Accessability Aid",
-  label: "",
+  label: "Accessability",
 };
-export const links: TopbarLink[] = [
-  // {
-  //   label: "services",
-  //   href: "#",
-  // },
-];
+export const links: TopbarLink[] = [];
 export const extras: Extras[] = [
   {
     label: "Sign in",
     href: "/signin",
   },
   {
-    href: "/cart",
+    href: "/chat",
     type: "icon",
-    icon: ShoppingBagIcon,
+    icon: ChatBubbleLeftIcon,
   },
 ];
 
 export const topbarProps = { links, extras };
-export const actions: Action[] = [
-  // { type: "primary", label: "Get full access", href: "/shop" },
-  // { type: "default", label: "Learn more", href: "/shop/electronics" },
-  { type: "secondary", label: "Shop by Category", href: "/shop" },
-  { type: "default", label: "All Products", href: "/shop/electronics" },
-];
 
-export const heroProps: HeroProps = {
-  foreground: "text-white_",
-  // heading: ["Get Full Access", "to Australian Education."],
-  heading: ["Provector", "re-up.ph"],
-  // subheading: "Launch a full featured ecommerce platform. ",
-  subheading: "Turn matte to radiant & blush to glow. ",
-  actions,
-};
-
-export const serviceContents: StickyScrollContent[] = [
+export const scrollContents: StickyScrollContent[] = [
   {
     title: "Ready to Transform Your Future?",
     description:
@@ -67,23 +45,9 @@ export const serviceContents: StickyScrollContent[] = [
 ];
 
 export const tabItems: TabItem[] = [
-  { id: 0, value: "intro", label: "Intro", content: serviceContents },
-  { id: 5, value: "services", label: "Services", content: serviceContents },
-  { id: 1, value: "community", label: "Community", content: serviceContents },
-  { id: 2, value: "guides", label: "Guides", content: serviceContents },
-  { id: 3, value: "about", label: "About Us", content: serviceContents },
+  { id: 0, value: "intro", label: "Intro", content: scrollContents },
+  { id: 5, value: "services", label: "Services", content: scrollContents },
+  { id: 1, value: "community", label: "Community", content: scrollContents },
+  { id: 2, value: "guides", label: "Guides", content: scrollContents },
+  { id: 3, value: "about", label: "About Us", content: scrollContents },
 ];
-
-/* media with image
-(
-      <div className="flex h-full w-full items-center justify-center text-white">
-        <Image
-          src="/svg/heart_v1.svg"
-          width={300}
-          height={300}
-          className="h-full w-full object-cover"
-          alt="linear board demo"
-        />
-      </div>
-    )
-*/

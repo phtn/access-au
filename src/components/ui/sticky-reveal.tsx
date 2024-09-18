@@ -70,11 +70,11 @@ export const StickyScroll = ({
   // useEffect(() => {
   //   setBackgroundGradient(linearGradients[activeCard % linearGradients.length]);
   // }, [activeCard]);
-  console.log(activeCard);
+  // console.log(activeCard);
   return (
     <motion.div
       className={cn(
-        "relative flex h-[30rem] justify-center space-x-10 overflow-y-auto p-10 text-gray-400 transition-colors duration-300 ease-out md:rounded-xl",
+        "relative flex h-[50rem] w-[calc(100vw-200px)] justify-center space-x-10 overflow-y-auto p-10 text-gray-400 transition-colors duration-300 ease-out md:rounded-2xl",
         linearGradients[activeCard],
         contentClassName,
       )}
@@ -83,7 +83,10 @@ export const StickyScroll = ({
       <div className="div relative flex items-start px-4">
         <div className="max-w-3xl text-slate-700">
           {content.map((item, index) => (
-            <div key={item.title + index} className="mb-40 space-y-12 pt-20">
+            <div
+              key={item.title + index}
+              className="mb-[20rem] space-y-12 pt-20"
+            >
               <motion.h2
                 initial={{
                   opacity: 0,

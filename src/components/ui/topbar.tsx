@@ -10,8 +10,7 @@ import type { DualIcon } from "@/types";
 import { Logo } from "@/components/app/logo";
 import { motion } from "framer-motion";
 import { useCallback } from "react";
-import { Loader } from "lucide-react";
-import { useAuthContext, useCart } from "@/app/ctx";
+import { useAuthContext } from "@/app/ctx";
 
 export interface Brand {
   label?: string;
@@ -32,15 +31,8 @@ interface TopbarProps {
   links?: TopbarLink[];
   extras?: Extras[];
 }
-export function Topbar({ brand, extras }: TopbarProps) {
+export function Topbar({ extras }: TopbarProps) {
   const { user } = useAuthContext();
-  const { itemCount, loading } = useCart();
-
-  const CartItemCount = useCallback(() => {
-    if (loading)
-      return <Loader className="size-3 shrink-0 animate-spin text-white" />;
-    return <p className="animate-enter">{itemCount}</p>;
-  }, [loading, itemCount]);
 
   const NavContentExtra = useCallback(() => {
     return (
@@ -61,18 +53,12 @@ export function Topbar({ brand, extras }: TopbarProps) {
                   : extra.href
               }
               className="shrink-0 px-2"
-            >
-              {extra.type === "icon" ? (
-                <div className="-ml-5 mb-2 flex size-[24px] items-center justify-center rounded-full border-[3px] border-white bg-gray-800 font-ibm text-[10px] font-medium text-white shadow-md">
-                  <CartItemCount />
-                </div>
-              ) : null}
-            </LinkBtn>
+            ></LinkBtn>
           </NavbarItem>
         ))}
       </NavbarContent>
     );
-  }, [extras, CartItemCount, user]);
+  }, [extras, user]);
   return (
     <Navbar shouldHideOnScroll isBlurred maxWidth="xl">
       <NavbarBrand>
@@ -80,8 +66,8 @@ export function Topbar({ brand, extras }: TopbarProps) {
           <div>
             <Logo />
           </div>
-          <motion.div className="mx-4 animate-enter font-sarabun font-medium tracking-tighter text-gray-800 md:mx-4 portrait:text-sm">
-            {brand?.label}
+          <motion.div className="mx-4 animate-enter font-sarabun font-semibold text-gray-800 portrait:text-sm">
+            Accessability
           </motion.div>
         </Link>
       </NavbarBrand>
