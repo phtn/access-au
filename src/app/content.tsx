@@ -29,7 +29,7 @@ export const PageCont = () => {
         <Haze />
         <div className="h-2 w-full bg-sky-100/20"></div>
         <Rect />
-        <div className="h-32" />
+        <div className="h-[7.50rem]" />
         <div ref={scrollRef} />
         <UniTablist
           onSelect={setSelected}
