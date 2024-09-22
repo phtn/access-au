@@ -11,17 +11,6 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
 
-    TURSO_DATABASE_URL: z.string(),
-    TURSO_AUTH_TOKEN: z.string(),
-
-    PM_PB_TEST_KEY: z.string(),
-    PM_SC_TEST_KEY: z.string(),
-
-    G_WEB_CLIENT_ID: z.string(),
-    G_CLIENT_SECRET: z.string(),
-
-    F_ADMIN: z.string(),
-
     UPSTASH_VECTOR_REST_URL: z.string(),
     UPSTASH_VECTOR_REST_TOKEN: z.string(),
     UPSTASH_REDIS_REST_URL: z.string(),
@@ -29,9 +18,6 @@ export const env = createEnv({
     UPSTASH_EMAIL: z.string(),
     UPSTASH_API_K: z.string(),
     QSTASH_TOKEN: z.string(),
-
-    D_CONVEX_DEP_URL: z.string(),
-    D_CONVEX_DEP_KEY: z.string(),
   },
 
   /**
@@ -47,7 +33,6 @@ export const env = createEnv({
     NEXT_PUBLIC_F_APP_ID: z.string(),
     NEXT_PUBLIC_F_MEASUREMENT: z.string(),
     NEXT_PUBLIC_F_AUTH_DOMAIN: z.string(),
-
     NEXT_PUBLIC_F_CONF_DOC_ID: z.string(),
   },
 
@@ -57,15 +42,6 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
-
-    TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL,
-    TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
-
-    PM_PB_TEST_KEY: process.env.PM_PB_TEST_KEY,
-    PM_SC_TEST_KEY: process.env.PM_SC_TEST_KEY,
-
-    G_WEB_CLIENT_ID: process.env.G_WEB_CLIENT_ID,
-    G_CLIENT_SECRET: process.env.G_CLIENT_SECRET,
 
     UPSTASH_VECTOR_REST_URL: process.env.UPSTASH_VECTOR_REST_URL,
     UPSTASH_VECTOR_REST_TOKEN: process.env.UPSTASH_VECTOR_REST_TOKEN,
@@ -82,12 +58,8 @@ export const env = createEnv({
     NEXT_PUBLIC_F_MESSAGING_ID: process.env.NEXT_PUBLIC_F_MESSAGING_ID,
     NEXT_PUBLIC_F_APP_ID: process.env.NEXT_PUBLIC_F_APP_ID,
     NEXT_PUBLIC_F_MEASUREMENT: process.env.NEXT_PUBLIC_F_MEASUREMENT,
-    F_ADMIN: process.env.F_ADMIN,
 
     NEXT_PUBLIC_F_CONF_DOC_ID: process.env.NEXT_PUBLIC_F_CONF_DOC_ID,
-
-    D_CONVEX_DEP_URL: process.env.D_CONVEX_DEP_URL,
-    D_CONVEX_DEP_KEY: process.env.D_CONVEX_DEP_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
