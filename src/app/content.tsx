@@ -9,6 +9,7 @@ import { UniContent } from "@/components/uni/content";
 import { UniTablist } from "@/components/uni/tabs";
 import { memo, useCallback, useRef, useState } from "react";
 import { scrollContents, tabItems, topbarProps } from "./static";
+import { AboutUs } from "@/components/about-us/content";
 
 export const PageCont = () => {
   const [selected, setSelected] = useState<number>(0);
@@ -39,6 +40,7 @@ export const PageCont = () => {
 
         <UniContent selected={selected} />
 
+        <AboutUs />
         <div className="_h-[200px]" />
       </div>
     </main>

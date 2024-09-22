@@ -17,7 +17,6 @@ import {
   CardHeader,
   Image,
   Link,
-  ScrollShadow,
   Snippet,
   Tab,
   Tabs,
@@ -269,16 +268,13 @@ const ContentBody = (props: { children?: ReactNode }) => (
 );
 
 export const TabContent = (props: TabContentProps) => (
-  <ScrollShadow
-    size={60}
-    className="_lg:max-w-[calc(100vw/1.75)]_ my-8 w-full  max-w-full space-y-4 overflow-auto rounded-xl bg-white px-4 py-5 md:h-[calc(100vh-120px)] md:px-6 lg:w-full xl:h-[calc(100vh-160px)] xl:max-w-[calc(100vw/1.40)]"
-  >
+  <div className="my-8 w-full max-w-full space-y-4 overflow-auto rounded-xl bg-white px-4 py-5 md:h-[calc(100vh*1.25)] md:px-6 lg:w-full">
     <ContentHeader {...props.header} />
     <ContentBody>
       <DynamicRenderer data={props.children} />
     </ContentBody>
     <Sources sources={props.sources} />
-  </ScrollShadow>
+  </div>
 );
 
 const Cover = (props: { data: CoverData[]; title?: string }) => (

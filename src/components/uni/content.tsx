@@ -3,6 +3,7 @@ import { memo, useMemo, type FC } from "react";
 import { Sidebar } from "./components";
 import { defaultTabs } from "./default";
 import { melbourneTabs } from "./melbourne";
+import { ScrollShadow } from "@nextui-org/react";
 
 const DefaultTab = memo(() => <Sidebar tabs={defaultTabs} />);
 DefaultTab.displayName = "GroupOf8";
@@ -16,13 +17,14 @@ export const UniContent = (props: { selected: number }) => {
     [props.selected, contents],
   );
   return (
-    <div
+    <ScrollShadow
+      size={60}
       className={
-        "relative h-[calc(100vh-124px)] w-full overflow-auto bg-default/60 px-10 xl:px-24"
+        "relative h-[calc(100vh*1.5)] w-full overflow-auto bg-default/60 px-10 xl:px-24"
       }
     >
       {Component ? <Component /> : <UnderDevelopment id={props.selected} />}
-    </div>
+    </ScrollShadow>
   );
 };
 
