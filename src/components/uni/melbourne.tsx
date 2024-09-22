@@ -475,7 +475,7 @@ export const melbourneTabs: SidebarProps[] = [
             },
             {
               id: 1,
-              title: "International Student Population",
+              title: "International Students",
               value: "42%",
               tag: "population",
             },

@@ -28,12 +28,12 @@ const UniTab = ({ selected, onSelect, scrollFn, props }: UniTabs) => {
     <Button
       variant={"ghost"}
       onClick={handleSelect}
-      className={cn("h-fit py-2 portrait:w-fit", {
-        "via-default-60 bg-gradient-to-br from-default/20 to-default":
+      className={cn("shrink-0 px-1 md:h-fit md:py-2", {
+        "via-default-60 bg-gradient-to-br from-default/20 to-default py-3":
           selected === id,
       })}
     >
-      <Image alt={name} src={src} height={56} className={cn("my-1 shrink-0")} />
+      <Image alt={name} src={src} height={56} className={cn("my-2")} />
     </Button>
     // </div>
   );
@@ -65,8 +65,8 @@ export const UniTablist = ({
   );
 
   return (
-    <div className="w-screen overflow-auto py-4 shadow-md">
-      <div className="flex w-full items-center justify-evenly px-0 md:px-8 portrait:space-x-6">
+    <div className="w-screen overflow-auto p-6 shadow-md">
+      <div className="flex w-full items-center space-x-16 px-0 md:justify-evenly md:px-8 portrait:space-x-6">
         {unilist.map(render)}
       </div>
     </div>

@@ -40,7 +40,7 @@ const buttons: Buttons[] = [
 
 export const HeroLight = ({ actions }: HeroProps) => {
   const heading = ["Get Full Access", "to Australian Education."];
-  const size = useResize();
+  const width = useResize();
 
   const ActionButtons = useCallback(
     () =>
@@ -48,7 +48,7 @@ export const HeroLight = ({ actions }: HeroProps) => {
         <Button
           onClick={actions[i]}
           key={btn.label}
-          size={size.width <= 500 ? `sm` : `lg`}
+          size={width <= 500 ? `sm` : `lg`}
           variant={"shadow"}
           color={btn.color}
           className={cn(
@@ -66,13 +66,13 @@ export const HeroLight = ({ actions }: HeroProps) => {
           {btn?.icon ? <btn.icon className={"size-4"} /> : null}
         </Button>
       )),
-    [actions, size],
+    [actions, width],
   );
 
   return (
     <div className="relative flex w-screen max-w-full flex-col items-center justify-center overflow-clip leading-none md:w-full md:max-w-6xl portrait:w-screen">
       <div className="h-12 portrait:hidden" />
-      <div className="h-[20rem] w-full from-zinc-100/40 via-zinc-100/20 to-transparent md:grid lg:mx-12 lg:grid-cols-2 portrait:flex portrait:bg-gradient-to-br portrait:from-amber-100/20 portrait:via-amber-100/15">
+      <div className="h-[20rem] w-full from-zinc-100/40 via-zinc-100/20 to-transparent md:grid lg:mx-12 lg:grid-cols-2 portrait:flex portrait:bg-gradient-to-br portrait:from-default-100/20 portrait:via-default-100/15">
         <div className="relative flex w-full items-end px-6 pb-8 pt-12 md:p-12 md:pt-12">
           <div
             className={cn("w-full space-y-16 text-gray-800 portrait:relative")}

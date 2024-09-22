@@ -21,7 +21,13 @@ import {
   Tab,
   Tabs,
 } from "@nextui-org/react";
-import { useCallback, type ReactElement, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 
 type Id = string | number;
 
@@ -150,6 +156,18 @@ export interface SidebarProps {
 }
 
 export const Sidebar = (props: { tabs: SidebarProps[] }) => {
+  const [placement, setPlacement] = useState<"end" | "top">("top");
+
+  const width = useResize();
+
+  useEffect(() => {
+    if (width >= 700) {
+      setPlacement("end");
+    } else {
+      setPlacement("top");
+    }
+  }, [width]);
+
   const render = useCallback(
     (tab: SidebarProps) => (
       <Tab
@@ -162,19 +180,17 @@ export const Sidebar = (props: { tabs: SidebarProps[] }) => {
     [],
   );
 
-  const size = useResize();
-
   return (
     <>
       <Tabs
         aria-label="Options"
-        placement={size.width > 768 ? "end" : "top"}
-        className="h-fit portrait:w-screen"
+        placement={placement}
+        className="h-fit"
         classNames={{
           tabList:
-            "mt-8 p-2 md:p-4 bg-white portrait:mx-2 portrait:w-screen portrait:overflow-auto",
+            "md:mt-8 portrait:rounded-none portrait:w-screen portrait:bg-default/30 portrait:border-t border-default-400/60 portrait:p-2 md:p-4 bg-white portrait:overflow-auto",
           tab: "md:h-14 h-10 lg:mx-6 rounded-3xl",
-          panel: "md:mr-6 mr-0",
+          panel: "md:mr-6 py-0 mr-0 portrait:w-full",
         }}
         color="warning"
         radius="sm"
@@ -186,7 +202,7 @@ export const Sidebar = (props: { tabs: SidebarProps[] }) => {
 };
 
 export const TabTitle = (props: { title?: string; children?: ReactNode }) => (
-  <div className="flex h-fit max-h-[calc(100vh-160px)] items-center justify-start md:space-x-6 md:px-4">
+  <div className="flex h-fit items-center justify-start md:space-x-6 md:px-4">
     <span className="font-medium tracking-tight">{props.title}</span>
     {props.children}
   </div>
@@ -232,7 +248,7 @@ const DynamicRenderer = (props: { data: DynamicChild[] | undefined }) => {
         return null;
     }
   }, []);
-  return <div className="relative space-y-10">{props.data?.map(render)}</div>;
+  return <div className="relative space-y-12">{props.data?.map(render)}</div>;
 };
 
 const ContentHeader = (props: ContentHeaderProps) => (
@@ -264,11 +280,11 @@ const ContentHeader = (props: ContentHeaderProps) => (
 );
 
 const ContentBody = (props: { children?: ReactNode }) => (
-  <div className="w-full space-y-10 leading-8 md:pr-4">{props.children}</div>
+  <div className="w-full space-y-12 leading-8 md:pr-4">{props.children}</div>
 );
 
 export const TabContent = (props: TabContentProps) => (
-  <div className="my-8 w-full max-w-full space-y-4 overflow-auto rounded-xl bg-white px-4 py-5 md:h-[calc(100vh*1.25)] md:px-6 lg:w-full">
+  <div className="h-fit space-y-4 bg-white px-4 py-6 md:my-8 md:rounded-xl md:px-6">
     <ContentHeader {...props.header} />
     <ContentBody>
       <DynamicRenderer data={props.children} />
@@ -279,17 +295,16 @@ export const TabContent = (props: TabContentProps) => (
 
 const Cover = (props: { data: CoverData[]; title?: string }) => (
   <figure>
-    <div className="flex items-center px-2 py-6 md:space-x-10 md:px-10">
+    <div className="flex items-center py-6 md:space-x-10 md:px-10">
       {props.data.map((cover, i) => (
         <Image
           isZoomed
           isBlurred
-          height={300}
           key={cover.id}
           src={cover.src}
           alt={cover.caption}
-          className={cn("aspect-video rounded-lg lg:h-[250px] xl:h-[300px]", {
-            "w-full portrait:hidden": i === 1,
+          className={cn("rounded-lg", {
+            "md:w-full portrait:hidden": i === 1,
           })}
         />
       ))}
@@ -300,7 +315,7 @@ const Cover = (props: { data: CoverData[]; title?: string }) => (
 
 const Article = (props: { data: ArticleData[] }) => {
   return props.data.map((item) => (
-    <p className="text-justify" key={item.id}>
+    <p className="px-4 text-justify" key={item.id}>
       {`${item.content}`}
     </p>
   ));
@@ -353,14 +368,14 @@ export const List = (props: {
 );
 
 export const CopyInfo = ({ title, data }: Info) => (
-  <div className="flex flex-col space-y-4 font-ibm md:px-4">
+  <div className="flex flex-col space-y-4 overflow-auto font-ibm md:px-4">
     <p className="text-lg font-semibold tracking-tight">{title}</p>
     {data.map((info) => (
       <Snippet
         key={info.id}
-        size="lg"
+        size="md"
         symbol={info.symbol}
-        className="w-full overflow-auto md:w-fit"
+        className="overflow-auto md:w-fit portrait:max-w-[40ch]"
       >
         {`${info.content}`}
       </Snippet>
@@ -388,11 +403,11 @@ export const MetricPanel = (props: Omit<MetricData, "value" | "id">) => {
   return (
     <div className="flex h-[130px] w-full cursor-pointer flex-col rounded-xl border-[0.33px] border-default-400/60 p-4 text-default-800 shadow-md shadow-default transition-shadow hover:shadow-lg hover:shadow-default/60">
       <div className="flex h-full w-full justify-between">
-        <div className="-space-y-1.5">
-          <div className="leading-2 font-medium tracking-tight text-neutral-800">
+        <div className="">
+          <div className="font-medium leading-none tracking-tight text-neutral-800">
             {props.title}
           </div>
-          <div className="text-xs font-medium uppercase tracking-tight text-neutral-400">
+          <div className="text-[10px] font-medium uppercase tracking-tight text-neutral-400 md:text-xs">
             {props.tag}
           </div>
         </div>
@@ -406,7 +421,7 @@ export const MetricPanel = (props: Omit<MetricData, "value" | "id">) => {
 
 export const MetricPanelContent = (props: { value: MetricData["value"] }) => {
   return (
-    <div className="flex w-full items-center justify-end self-baseline text-3xl font-semibold tracking-tighter">
+    <div className="flex w-full items-center justify-end self-baseline text-xl font-semibold leading-none tracking-tighter md:text-3xl">
       <div className="flex w-full flex-col items-end">
         <div className="animate-enter">{props.value}</div>
         <div className="text-xs font-light opacity-80"></div>
@@ -427,12 +442,12 @@ const Metric = (props: { data: MetricData[] }) => (
 
 const Accord = (props: { data: AccordData[] }) => {
   return (
-    <div className="p-6">
+    <div className="w-full py-2 md:p-6">
       <Accordion
         variant="shadow"
         itemClasses={{
           title: "tracking-tight text-sky-600",
-          base: "shadow-none drop-shadow-default drop-shadow my-2",
+          base: "shadow-none drop-shadow-default drop-shadow px-6 my-2",
         }}
         className=""
       >

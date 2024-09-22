@@ -19,9 +19,7 @@ export const UniContent = (props: { selected: number }) => {
   return (
     <ScrollShadow
       size={60}
-      className={
-        "relative h-[calc(100vh*1.5)] w-full overflow-auto bg-default/60 px-10 xl:px-24"
-      }
+      className={"relative h-fit w-full overflow-auto bg-default/60 xl:px-24"}
     >
       {Component ? <Component /> : <UnderDevelopment id={props.selected} />}
     </ScrollShadow>

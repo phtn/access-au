@@ -1,34 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 
 export function useResize() {
-  const getSize = () => {
-    if (typeof window !== "undefined") {
-      return {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
-    }
-    return { width: 1080, height: 720 };
-  };
-  const [size, setSize] = useState(getSize());
+  const [width, setWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 1080,
+  );
 
   const handleResize = useCallback(() => {
-    let ticking = false;
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        setSize(getSize());
-        ticking = false;
-      });
-      ticking = true;
+    if (typeof window !== "undefined") {
+      setWidth(window.innerWidth);
     }
-  }, []);
+  }, [setWidth]);
 
   useEffect(() => {
+    console.log(width);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize]);
+  }, [handleResize, width]);
 
-  return size;
+  return width;
 }
 // import { getAllAdmins } from "@/lib/db/admin";
 // import { deleteCategory, getAllCategories } from "@/lib/db/category";
