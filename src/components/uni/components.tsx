@@ -1,3 +1,4 @@
+import { useResize } from "@/app/hooks";
 import {
   Carousel,
   CarouselContent,
@@ -5,11 +6,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import type { ClassName } from "@/types";
 import { cn } from "@/utils/cn";
-import {
-  DocumentMagnifyingGlassIcon,
-  EyeIcon,
-} from "@heroicons/react/24/outline";
 import {
   Accordion,
   AccordionItem,
@@ -18,112 +16,302 @@ import {
   CardFooter,
   CardHeader,
   Image,
+  Link,
   ScrollShadow,
   Snippet,
   Tab,
   Tabs,
 } from "@nextui-org/react";
-import { ChevronRightIcon } from "lucide-react";
-import type { ReactElement, ReactNode, SVGProps } from "react";
+import { useCallback, type ReactElement, type ReactNode } from "react";
 
-export interface SidebarProps {
-  tabId: number;
-  title: ReactElement | string;
-  key: string;
-  content: ReactElement | string;
-}
-export const Sidebar = (props: { tabs: SidebarProps[] }) => (
-  <div className="flex w-full flex-col">
-    <Tabs
-      aria-label="Options"
-      placement={"end"}
-      classNames={{
-        tabList: " p-4",
-        tab: "h-[56px] mx-6 rounded-3xl",
-        panel: "mr-6",
-      }}
-      color="primary"
-      radius="sm"
-    >
-      {props.tabs.map((tab) => (
-        <Tab key={`${tab.tabId}_${tab.key}`} title={tab.title}>
-          <div className="w-full rounded-xl border shadow-sm">
-            {tab.content}
-          </div>
-        </Tab>
-      ))}
-    </Tabs>
-  </div>
-);
+type Id = string | number;
 
-export const TabTitle = (props: { title?: string; children?: ReactNode }) => (
-  <div className="flex h-fit max-h-[calc(100vh-160px)] items-center justify-start space-x-6 px-4">
-    <span className="font-medium tracking-tight">{props.title}</span>
-    {props.children}
-  </div>
-);
-
-interface TabContentProps {
-  title: string;
-  subtext?: string;
-  logo?: string;
-  source?: string;
-  updated?: number;
-  children?: ReactNode;
-  body?: ReactElement;
-  extra?: ReactElement | string;
-}
-
-export const TabContent = (props: TabContentProps) => (
-  <div className="h-[calc(100vh-160px)] w-full max-w-[calc(100vw/1.40)] space-y-4 overflow-auto px-6 pb-20 pt-6">
-    <TitleSection
-      title={props.title}
-      subtext={props.subtext}
-      logo={props.logo}
-      extra={props.extra}
-    />
-    <ContentBody>{props.children}</ContentBody>
-    <SourceSection title={props.source} updated={props.updated} />
-  </div>
-);
-
-const TitleSection = (props: {
-  title: string;
-  subtext?: string;
-  logo?: string;
-  extra?: ReactElement | string;
-}) => (
-  <div className="flex h-[72px] items-start justify-between">
-    <div className="flex items-center space-x-4">
-      {props.logo ? (
-        <Image
-          alt={props.logo}
-          isBlurred
-          src={props.logo}
-          className=""
-          width={72}
-        />
-      ) : null}
-      <div>
-        <h1 className="font-arc text-3xl tracking-tight">{props.title}</h1>
-        <p className="pl-2 font-light tracking-tight opacity-60">
-          {props.subtext}
-        </p>
-      </div>
-    </div>
-    {props.extra}
-  </div>
-);
-
-export interface Stats {
-  id: number;
+interface Stats {
+  id: Id;
   label: string;
   value: number | string;
   prefix?: string;
   suffix?: string;
 }
-export const StatsExtra = (props: { stats: Stats[] }) => (
-  <div className="flex items-center space-x-10 px-4 text-xs">
+
+interface ContentHeaderProps {
+  title: string;
+  subtext?: string;
+  extra?: Stats[];
+  href?: string;
+  logo?: string;
+}
+
+interface CoverData {
+  id: Id;
+  title?: string;
+  src: string;
+  caption: string;
+}
+
+interface ArticleData {
+  id: number | string;
+  title?: string;
+  subtext?: string;
+  content: string;
+}
+
+interface ListData {
+  id: Id;
+  content: string | number | boolean;
+  cols?: number;
+  marker?: "number" | "check";
+}
+
+interface AccordData {
+  id: number | string;
+  title: string;
+  subtext?: string;
+  content: string;
+}
+
+interface MetricData {
+  id: Id;
+  title: string;
+  tag?: string;
+  className?: ClassName;
+  children?: ReactNode;
+  value: number | string | boolean;
+}
+
+interface InfoData {
+  id: number;
+  title?: string;
+  subtext?: string;
+  content: string;
+  symbol: string;
+}
+
+interface Info {
+  title?: string;
+  data: InfoData[];
+}
+
+interface BentoData {
+  id: number;
+  title: string;
+  header: string;
+  category: string;
+  cover: string;
+  thumbnail: string;
+  href?: string;
+}
+
+interface Source {
+  id: Id;
+  title?: string;
+  href?: string;
+  updated?: number;
+}
+
+type ChildType =
+  | "article"
+  | "copy"
+  | "cover"
+  | "info"
+  | "bento"
+  | "list"
+  | "metric";
+type ChildData =
+  | ArticleData
+  | InfoData
+  | CoverData
+  | AccordData
+  | BentoData
+  | ListData
+  | MetricData;
+interface DynamicChild {
+  id: Id;
+  type: ChildType;
+  data: ChildData[];
+  title?: string;
+  cols?: number;
+  marker?: "number" | "check";
+}
+
+interface TabContentProps {
+  header: ContentHeaderProps;
+  href?: string;
+  sources?: Source[];
+  updated?: number;
+  children?: DynamicChild[];
+  body?: ReactElement;
+}
+
+export interface SidebarProps {
+  tabId: number;
+  title: string;
+  key: string;
+  content: TabContentProps;
+}
+
+export const Sidebar = (props: { tabs: SidebarProps[] }) => {
+  const render = useCallback(
+    (tab: SidebarProps) => (
+      <Tab
+        key={`${tab.tabId}_${tab.key}`}
+        title={<TabTitle title={tab.title} />}
+      >
+        <TabContent {...tab.content} />
+      </Tab>
+    ),
+    [],
+  );
+
+  const size = useResize();
+
+  return (
+    <>
+      <Tabs
+        aria-label="Options"
+        placement={size.width > 768 ? "end" : "top"}
+        className="h-fit portrait:w-screen"
+        classNames={{
+          tabList:
+            "mt-8 p-2 md:p-4 bg-white portrait:mx-2 portrait:w-screen portrait:overflow-auto",
+          tab: "md:h-14 h-10 lg:mx-6 rounded-3xl",
+          panel: "md:mr-6 mr-0",
+        }}
+        color="warning"
+        radius="sm"
+      >
+        {props.tabs.map(render)}
+      </Tabs>
+    </>
+  );
+};
+
+export const TabTitle = (props: { title?: string; children?: ReactNode }) => (
+  <div className="flex h-fit max-h-[calc(100vh-160px)] items-center justify-start md:space-x-6 md:px-4">
+    <span className="font-medium tracking-tight">{props.title}</span>
+    {props.children}
+  </div>
+);
+
+const DynamicRenderer = (props: { data: DynamicChild[] | undefined }) => {
+  const render = useCallback((item: DynamicChild) => {
+    switch (item.type) {
+      case "article":
+        return <Article key={item.id} data={item.data as ArticleData[]} />;
+      case "copy":
+        return (
+          <CopyInfo
+            title={item.title}
+            key={item.id}
+            data={item.data as InfoData[]}
+          />
+        );
+      case "cover":
+        return (
+          <Cover
+            key={item.id}
+            title={item.title}
+            data={item.data as CoverData[]}
+          />
+        );
+      case "info":
+        return <Accord key={item.id} data={item.data as AccordData[]} />;
+      case "bento":
+        return <Bento key={item.id} data={item.data as BentoData[]} />;
+      case "list":
+        return (
+          <List
+            key={item.id}
+            marker={item.marker}
+            cols={item.cols}
+            data={item.data as ListData[]}
+          />
+        );
+      case "metric":
+        return <Metric data={item.data as MetricData[]} />;
+      default:
+        return null;
+    }
+  }, []);
+  return <div className="relative space-y-10">{props.data?.map(render)}</div>;
+};
+
+const ContentHeader = (props: ContentHeaderProps) => (
+  <div className="flex h-[72px] items-start justify-between">
+    <Link
+      href={props.href}
+      className="flex items-center space-x-4 text-slate-800"
+    >
+      {props.logo ? (
+        <Image
+          alt={props.logo}
+          isBlurred
+          isLoading={false}
+          src={props.logo}
+          className="animate-enter"
+          disableSkeleton
+          width={72}
+        />
+      ) : null}
+      <div>
+        <h1 className="font-arc text-xl tracking-tight md:text-3xl">
+          {props.title}
+        </h1>
+        <p className="font-light tracking-tight opacity-60">{props.subtext}</p>
+      </div>
+    </Link>
+    {props.extra ? <HeaderExtra stats={props.extra} /> : null}
+  </div>
+);
+
+const ContentBody = (props: { children?: ReactNode }) => (
+  <div className="w-full space-y-10 leading-8 md:pr-4">{props.children}</div>
+);
+
+export const TabContent = (props: TabContentProps) => (
+  <ScrollShadow
+    size={60}
+    className="_lg:max-w-[calc(100vw/1.75)]_ my-8 w-full  max-w-full space-y-4 overflow-auto rounded-xl bg-white px-4 py-5 md:h-[calc(100vh-120px)] md:px-6 lg:w-full xl:h-[calc(100vh-160px)] xl:max-w-[calc(100vw/1.40)]"
+  >
+    <ContentHeader {...props.header} />
+    <ContentBody>
+      <DynamicRenderer data={props.children} />
+    </ContentBody>
+    <Sources sources={props.sources} />
+  </ScrollShadow>
+);
+
+const Cover = (props: { data: CoverData[]; title?: string }) => (
+  <figure>
+    <div className="flex items-center px-2 py-6 md:space-x-10 md:px-10">
+      {props.data.map((cover, i) => (
+        <Image
+          isZoomed
+          isBlurred
+          height={300}
+          key={cover.id}
+          src={cover.src}
+          alt={cover.caption}
+          className={cn("aspect-video rounded-lg lg:h-[250px] xl:h-[300px]", {
+            "w-full portrait:hidden": i === 1,
+          })}
+        />
+      ))}
+    </div>
+    <figcaption className="ml-3 text-xs md:ml-10">{props.title}</figcaption>
+  </figure>
+);
+
+const Article = (props: { data: ArticleData[] }) => {
+  return props.data.map((item) => (
+    <p className="text-justify" key={item.id}>
+      {`${item.content}`}
+    </p>
+  ));
+};
+
+export const HeaderExtra = (props: { stats: Stats[] }) => (
+  <div className="flex items-center text-xs md:space-x-6 md:px-4 lg:space-x-10 portrait:hidden">
     {props.stats.map((stat) => (
       <div
         key={stat.id}
@@ -131,87 +319,181 @@ export const StatsExtra = (props: { stats: Stats[] }) => (
           "flex animate-enter flex-col items-start first:delay-100 last:delay-200",
         )}
       >
-        <p className="font-arc text-xl font-medium">
-          <span className="text-sm font-normal opacity-30">{stat.prefix}</span>
+        <p className="font-arc font-medium ordinal md:text-xl">
+          <span className="text-xs font-thin xl:text-sm">{stat.prefix}</span>
           {stat.value}
-          <span className="text-sm font-normal opacity-30">{stat.suffix}</span>
+
+          <span className="text-xs font-light xl:text-sm">{stat.suffix}</span>
         </p>
-        <p className="opacity-70">{stat.label}</p>
+        <p className="opacity-70 portrait:text-[10px]">{stat.label}</p>
       </div>
     ))}
   </div>
 );
 
-export interface CopyDetails {
-  id: number;
-  value: string;
-  symbol: string;
-}
-export const CopyDetail = (props: {
-  details: CopyDetails[];
-  title: string;
+export const List = (props: {
+  data: ListData[];
+  cols?: number;
+  marker: "number" | "check" | undefined;
 }) => (
-  <div className="flex flex-col space-y-4 px-4">
-    <p className="text-lg font-medium tracking-tight">Contact details</p>
-    {props.details.map((detail) => (
-      <Snippet
-        key={detail.id}
-        size="lg"
-        symbol={detail.symbol}
-        className="w-fit"
+  <div className={cn("w-full px-6")}>
+    {[new Array(props.cols ?? 1)].map((_, i) => (
+      <ol
+        key={`_${i}`}
+        className={cn(
+          "list-inside list-decimal py-4 font-medium marker:font-light marker:text-gray-500",
+          {
+            "list-image-[url('/svg/check.svg')] marker:size-8 marker:text-green-500":
+              props.marker === "check",
+          },
+        )}
       >
-        {detail.value}
+        {props.data.map((item) => (
+          <li key={item.id}>{`${item.content}`} </li>
+        ))}
+      </ol>
+    ))}
+  </div>
+);
+
+export const CopyInfo = ({ title, data }: Info) => (
+  <div className="flex flex-col space-y-4 font-ibm md:px-4">
+    <p className="text-lg font-semibold tracking-tight">{title}</p>
+    {data.map((info) => (
+      <Snippet
+        key={info.id}
+        size="lg"
+        symbol={info.symbol}
+        className="w-full overflow-auto md:w-fit"
+      >
+        {`${info.content}`}
       </Snippet>
     ))}
   </div>
 );
 
-const ContentBody = (props: { children?: ReactNode }) => (
-  <ScrollShadow className="w-full space-y-10 text-justify leading-8">
-    {props.children}
-  </ScrollShadow>
-);
-
-const SourceSection = (props: {
-  title?: string;
-  href?: string;
-  updated?: number;
-}) => (
-  <section className="flex items-center justify-between py-10 font-arc text-xs italic tracking-wide opacity-50">
-    <div className="flex items-center space-x-2">
-      <DocumentMagnifyingGlassIcon className="size-3.5 flex-shrink-0 stroke-1 text-gray-800" />
-      <code>source </code>
-      <ChevronRightIcon className="size-3 flex-shrink-0 text-gray-800" />{" "}
-      <code>{props.title}</code>
-    </div>
-    <code>{props.updated}</code>
+const Sources = (props: { sources?: Source[] }) => (
+  <section className="flex flex-col items-start py-10">
+    {props.sources?.map((source) => (
+      <Link
+        href={source.href}
+        key={source.id}
+        className="flex items-center space-x-2 font-arc text-[10px] italic tracking-tight text-gray-400 hover:text-gray-800"
+      >
+        <code className="not-italic">[{source.id}]</code>
+        <code>{`${source.href}`}</code>
+        <code>{source.updated}</code>
+      </Link>
+    ))}
   </section>
 );
 
-interface AccordionItemProps {
-  id: number;
-  title: string;
-  content: string;
-}
-interface AccordionChildProps {
-  list: AccordionItemProps[];
-}
-export const AccordionChild = ({ list }: AccordionChildProps) => {
+export const MetricPanel = (props: Omit<MetricData, "value" | "id">) => {
+  return (
+    <div className="flex h-[130px] w-full cursor-pointer flex-col rounded-xl border-[0.33px] border-default-400/60 p-4 text-default-800 shadow-md shadow-default transition-shadow hover:shadow-lg hover:shadow-default/60">
+      <div className="flex h-full w-full justify-between">
+        <div className="-space-y-1.5">
+          <div className="leading-2 font-medium tracking-tight text-neutral-800">
+            {props.title}
+          </div>
+          <div className="text-xs font-medium uppercase tracking-tight text-neutral-400">
+            {props.tag}
+          </div>
+        </div>
+        <div></div>
+      </div>
+      {props.children}
+    </div>
+  );
+};
+// <props.icon className="size-6 stroke-1 text-neutral-500" />
+
+export const MetricPanelContent = (props: { value: MetricData["value"] }) => {
+  return (
+    <div className="flex w-full items-center justify-end self-baseline text-3xl font-semibold tracking-tighter">
+      <div className="flex w-full flex-col items-end">
+        <div className="animate-enter">{props.value}</div>
+        <div className="text-xs font-light opacity-80"></div>
+      </div>
+    </div>
+  );
+};
+
+const Metric = (props: { data: MetricData[] }) => (
+  <div className="mb-4 grid w-full grid-cols-2 gap-6 md:grid-cols-3">
+    {props.data.map((metric) => (
+      <MetricPanel key={metric.id} title={metric.title} tag={metric.tag}>
+        <MetricPanelContent value={metric.value} />
+      </MetricPanel>
+    ))}
+  </div>
+);
+
+const Accord = (props: { data: AccordData[] }) => {
   return (
     <div className="p-6">
       <Accordion
-        variant="splitted"
-        itemClasses={{ title: "tracking-tight text-sky-600" }}
+        variant="shadow"
+        itemClasses={{
+          title: "tracking-tight text-sky-600",
+          base: "shadow-none drop-shadow-default drop-shadow my-2",
+        }}
+        className=""
       >
-        {list.map((item) => (
-          <AccordionItem key={item.id} title={item.title}>
-            {item.content}
+        {props.data.map((item) => (
+          <AccordionItem
+            key={item.id}
+            subtitle={`${item.subtext ?? ""}`}
+            title={`${item.title}`}
+          >
+            {`${item.content}`}
           </AccordionItem>
         ))}
       </Accordion>
     </div>
   );
 };
+
+export const Bento = (props: { data: BentoData[] }) => (
+  <div className="grid w-full grid-cols-1 gap-12 px-12 py-6 md:grid-cols-2">
+    {props.data.map((item) => (
+      <BentoBox key={item.id} {...item} />
+    ))}
+  </div>
+);
+
+const BentoBox = (props: BentoData) => (
+  <Card isFooterBlurred className="h-auto w-full">
+    <CardHeader className="absolute top-1 z-10 flex-col items-start">
+      <p className="text-tiny font-bold uppercase text-white/60">
+        {`${props.header}`}
+      </p>
+      <h4 className="drop-shadow-default text-xl font-semibold tracking-tighter text-white drop-shadow-md">{`${props.title}`}</h4>
+    </CardHeader>
+    <Image
+      removeWrapper
+      alt="Relaxing app background"
+      className="z-0 h-full w-full object-cover"
+      src={props.cover}
+    />
+    <CardFooter className="absolute bottom-0 z-10 border-t-1 border-default-600 bg-black/40 dark:border-default-100">
+      <div className="flex flex-grow items-center gap-2">
+        <Image
+          alt="go8-logo"
+          className="aspect-square size-10 rounded-full bg-black object-contain"
+          src={props.thumbnail}
+        />
+        <div className="flex flex-col">
+          <p className="text-tiny text-white/60">{props.category}</p>
+          <p className="text-tiny text-white/60"></p>
+        </div>
+      </div>
+      <Button radius="full" size="sm" className="flex">
+        <p>Read</p>
+      </Button>
+    </CardFooter>
+  </Card>
+);
 
 export function Size() {
   return (
@@ -239,84 +521,3 @@ export function Size() {
     </Carousel>
   );
 }
-
-export const GalleryIcon = (props: SVGProps<SVGSVGElement>) => (
-  <svg
-    aria-hidden="true"
-    focusable="false"
-    height="24"
-    role="presentation"
-    viewBox="0 0 24 24"
-    width="24"
-    fill="none"
-    {...props}
-  >
-    <path
-      d="M2.58078 19.0112L2.56078 19.0312C2.29078 18.4413 2.12078 17.7713 2.05078 17.0312C2.12078 17.7613 2.31078 18.4212 2.58078 19.0112Z"
-      fill="currentColor"
-    />
-    <path
-      d="M9.00109 10.3811C10.3155 10.3811 11.3811 9.31553 11.3811 8.00109C11.3811 6.68666 10.3155 5.62109 9.00109 5.62109C7.68666 5.62109 6.62109 6.68666 6.62109 8.00109C6.62109 9.31553 7.68666 10.3811 9.00109 10.3811Z"
-      fill="currentColor"
-    />
-    <path
-      d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81V16.19C2 17.28 2.19 18.23 2.56 19.03C3.42 20.93 5.26 22 7.81 22H16.19C19.83 22 22 19.83 22 16.19V13.9V7.81C22 4.17 19.83 2 16.19 2ZM20.37 12.5C19.59 11.83 18.33 11.83 17.55 12.5L13.39 16.07C12.61 16.74 11.35 16.74 10.57 16.07L10.23 15.79C9.52 15.17 8.39 15.11 7.59 15.65L3.85 18.16C3.63 17.6 3.5 16.95 3.5 16.19V7.81C3.5 4.99 4.99 3.5 7.81 3.5H16.19C19.01 3.5 20.5 4.99 20.5 7.81V12.61L20.37 12.5Z"
-      fill="currentColor"
-    />
-  </svg>
-);
-
-export interface BentoProps {
-  id: number;
-  title: string;
-  header: string;
-  category: string;
-  cover: string;
-  thumbnail: string;
-}
-interface BentoChildProps {
-  list: BentoProps[];
-}
-export const BentoChild = ({ list }: BentoChildProps) => {
-  return (
-    <div className="grid w-full grid-cols-1 gap-12 px-12 py-6 md:grid-cols-2">
-      {list.map((item) => (
-        <Bento key={item.id} {...item} />
-      ))}
-    </div>
-  );
-};
-
-const Bento = (props: BentoProps) => (
-  <Card isFooterBlurred className="h-[300px] w-full">
-    <CardHeader className="absolute top-1 z-10 flex-col items-start">
-      <p className="text-tiny font-bold uppercase text-white/60">
-        {props.header}
-      </p>
-      <h4 className="text-xl font-medium text-white/90">{props.title}</h4>
-    </CardHeader>
-    <Image
-      removeWrapper
-      alt="Relaxing app background"
-      className="z-0 h-full w-full object-cover"
-      src={props.cover}
-    />
-    <CardFooter className="absolute bottom-0 z-10 border-t-1 border-default-600 bg-black/40 dark:border-default-100">
-      <div className="flex flex-grow items-center gap-2">
-        <Image
-          alt="go8-logo"
-          className="aspect-square size-10 rounded-full bg-black object-contain"
-          src={props.thumbnail}
-        />
-        <div className="flex flex-col">
-          <p className="text-tiny text-white/60">{props.category}</p>
-          <p className="text-tiny text-white/60">Read more.</p>
-        </div>
-      </div>
-      <Button radius="full" size="sm" className="flex">
-        <p>View</p>
-        <EyeIcon className="size-3.5 " />
-      </Button>
-    </CardFooter>
-  </Card>
-);

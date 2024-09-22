@@ -66,7 +66,7 @@ export function Topbar({ extras }: TopbarProps) {
           <div>
             <Logo />
           </div>
-          <motion.div className="mx-4 animate-enter font-sarabun font-semibold text-gray-800 portrait:text-sm">
+          <motion.div className="mx-4 animate-enter font-sans font-medium tracking-tighter text-gray-800 portrait:text-sm">
             Accessability
           </motion.div>
         </Link>

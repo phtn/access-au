@@ -13,53 +13,61 @@ import { scrollContents, tabItems, topbarProps } from "./static";
 export const PageCont = () => {
   const [selected, setSelected] = useState<number>(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+
   const handleExplore = useCallback(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && window.scrollY !== 668) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [scrollRef]);
   return (
-    <main className="flex min-h-screen flex-col items-center">
+    <main className="flex min-h-screen w-full flex-col items-center">
       <div className="relative flex h-full w-full flex-col items-center">
-        <div className="md:h-8" />
+        <div className="h-2 w-full lg:h-4 xl:h-8" />
         <Navbar />
-        <div className="md:h-[64px]" />
+        <div className="h-8 xl:h-16 portrait:hidden" />
         <HeroLight actions={[handleExplore]} />
         <Haze />
+        <div className="h-2 w-full bg-sky-100/20"></div>
         <Rect />
-        <div
-          ref={scrollRef}
-          className=" mx-8 w-[calc(100vw/1.4)] self-end border-b-[0.33px] border-slate-300/60"
-        />
+        <div className="h-32" />
+        <div ref={scrollRef} />
         <UniTablist
           onSelect={setSelected}
           selected={selected}
           scrollFn={handleExplore}
         />
-        <div className="grid h-10 w-screen grid-cols-5 justify-start px-8">
-          <div className="-mt-[0.33px] h-full w-full rounded-tl-[64px] border-t-[0.33px] border-default-400/60" />
-        </div>
 
         <UniContent selected={selected} />
 
-        <div className="flex h-[100px] w-screen justify-start overflow-clip border-default-400/60 border-y-[0.33] bg-default/0"></div>
-        <div className="px-4 portrait:w-screen"></div>
-        <div className="h-[200px]" />
+        <div className="_h-[200px]" />
       </div>
     </main>
   );
 };
 
 const Haze = () => (
-  <div className="mb-6 flex w-full md:h-[64px]">
-    <div className="h-full w-[300px] border-t-[0.33px] border-slate-200" />
-    <div className="h-full w-[100px] border-y-[0.33px] border-default-200" />
-    <div className="h-full w-[400px] border-b-[0.33px] border-default" />
-    <div className="h-full w-[400px]">
-      <div className="h-[32px] w-[300px] border-b-[0.33px] border-default" />
-      <div className="w-[100px] border-t-[0.33px] border-dotted border-default-400" />
+  <div className="flex h-8 w-screen overflow-clip bg-sky-100/20 md:w-full">
+    <div className="h-full w-[calc(100vw*0.3)] bg-sky-200/10">
+      <div className="h-3 w-full bg-white" />
+      <div className="h-4 w-2/3 bg-white/80" />
+      <div className="h-1 w-full bg-sky-300/10" />
     </div>
-    <div className="-ml-8 h-full w-[250px] border-b-[0.33px] border-dashed border-default-400/60" />
+    <div className=" flex h-8 w-[calc(100vw*0.4)] flex-col items-end justify-between">
+      <div className=" h-2 w-2/3 bg-white" />
+      <div className="flex h-full w-full justify-between">
+        <div className="h-2 w-1/5 bg-sky-100/10" />
+        <div className="h-1 w-1/4 bg-sky-200/20" />
+        <div className="h-1 w-1/3 bg-white/60" />
+      </div>
+    </div>
+    <div className="flex h-full w-[calc(100vw*0.2)] items-end justify-end bg-sky-100/20">
+      <div className="h-2 w-2/3 bg-sky-200/10" />
+    </div>
+    <div className="h-full w-[calc(100vw*0.1)]">
+      <div className="h-3 w-1/2 bg-sky-50" />
+      <div className="h-2 w-full bg-sky-100/20" />
+      <div className="h-1 w-1/2 bg-sky-200/20" />
+    </div>
   </div>
 );
 

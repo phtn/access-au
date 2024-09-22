@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { Button } from "../ui/button";
 import { type Dispatch, type SetStateAction, useCallback, memo } from "react";
 import { cn } from "@/utils/cn";
+import { Image } from "@nextui-org/react";
 
 export interface UniProps {
   id: number;
@@ -14,33 +14,28 @@ interface UniTabs {
   props: UniProps;
   selected: number;
   onSelect: Dispatch<SetStateAction<number>>;
+  scrollFn: VoidFunction;
 }
 
-const UniTab = ({ props, selected, onSelect }: UniTabs) => {
-  const { id, name, size, src } = props;
-  const handleSelect = () => {
+const UniTab = ({ selected, onSelect, scrollFn, props }: UniTabs) => {
+  const { id, name, src } = props;
+  const handleSelect = useCallback(() => {
     onSelect(id);
-  };
+    scrollFn();
+  }, [scrollFn, id, onSelect]);
   return (
-    <div className="flex items-center justify-center border-b py-10 shadow-default drop-shadow-md first:border-b-0 first:shadow-none last:rounded-br-[44px]">
-      <Button variant={"ghost"} onClick={handleSelect} className="border">
-        <Image
-          alt={name}
-          src={src}
-          height={size ?? 48}
-          width={size ?? 48}
-          unoptimized
-          priority
-          className={cn(
-            "m-2 h-[48px] w-auto rounded-full p-1",
-            {
-              "h-[56px]": size,
-            },
-            { "border border-gray-400/60 bg-default": selected === id },
-          )}
-        />
-      </Button>
-    </div>
+    // <div className="flex w-fit shrink-0 items-center justify-center border-default-400/60 py-2 shadow-default drop-shadow md:border-b-[0.33px] md:py-10 md:first:border-b-0 md:first:shadow-none md:last:rounded-br-[44px] portrait:w-full">
+    <Button
+      variant={"ghost"}
+      onClick={handleSelect}
+      className={cn("h-fit py-2 portrait:w-fit", {
+        "via-default-60 bg-gradient-to-br from-default/20 to-default":
+          selected === id,
+      })}
+    >
+      <Image alt={name} src={src} height={56} className={cn("my-1 shrink-0")} />
+    </Button>
+    // </div>
   );
 };
 const Uni = memo((props: UniTabs) => <UniTab {...props} />);
@@ -58,17 +53,22 @@ export const UniTablist = ({
 }: UnitTablistProps) => {
   const render = useCallback(
     (props: UniProps) => (
-      <Uni props={props} selected={selected} onSelect={onSelect} />
+      <Uni
+        props={props}
+        key={props.id}
+        selected={selected}
+        onSelect={onSelect}
+        scrollFn={scrollFn}
+      />
     ),
-    [onSelect, selected],
+    [onSelect, selected, scrollFn],
   );
 
   return (
-    <div
-      onClick={scrollFn}
-      className="grid w-full grid-cols-5 items-center justify-around px-8"
-    >
-      {unilist.map(render)}
+    <div className="w-screen overflow-auto py-4 shadow-md">
+      <div className="flex w-full items-center justify-evenly px-0 md:px-8 portrait:space-x-6">
+        {unilist.map(render)}
+      </div>
     </div>
   );
 };
@@ -83,20 +83,17 @@ const unilist: UniProps[] = [
     id: 1,
     name: "University Of Melbourne, Australia",
     src: "/svg/melbourneU.svg",
-    size: 48,
   },
   {
     id: 2,
     name: "University of Queensland, Australia",
     src: "/svg/queenU.svg",
-    size: 48,
   },
 
   {
     id: 3,
     name: "University Of Adelaide, Australia",
     src: "/svg/adelaideU.svg",
-    size: 48,
   },
   {
     id: 4,
@@ -113,7 +110,7 @@ const unilist: UniProps[] = [
 //   const unilist: UniProps[] = useMemo(
 //     () => [
 //       {
-//         id: 0,
+//         key: 0,
 //         name: "Group Of 8",
 //         src: "/svg/groupOf8.svg",
 //         onSelect,

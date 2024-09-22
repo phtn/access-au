@@ -1,3 +1,35 @@
+import { useState, useEffect, useCallback } from "react";
+
+export function useResize() {
+  const getSize = () => {
+    if (typeof window !== "undefined") {
+      return {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+    }
+    return { width: 1080, height: 720 };
+  };
+  const [size, setSize] = useState(getSize());
+
+  const handleResize = useCallback(() => {
+    let ticking = false;
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        setSize(getSize());
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize]);
+
+  return size;
+}
 // import { getAllAdmins } from "@/lib/db/admin";
 // import { deleteCategory, getAllCategories } from "@/lib/db/category";
 // import { deleteProduct, getAllProducts } from "@/lib/db/product";

@@ -1,7 +1,6 @@
 import { type StickyScrollContent } from "@/components/ui/sticky-reveal";
 import { type TabItem } from "@/components/ui/tabs";
 import type { Extras, TopbarLink, Brand } from "@/components/ui/topbar";
-import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 
 export const brand: Brand = {
   label: "Accessability",
@@ -11,11 +10,6 @@ export const extras: Extras[] = [
   {
     label: "Sign in",
     href: "/signin",
-  },
-  {
-    href: "/chat",
-    type: "icon",
-    icon: ChatBubbleLeftIcon,
   },
 ];
 
